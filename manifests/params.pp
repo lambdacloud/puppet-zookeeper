@@ -2,11 +2,13 @@
 #
 class zookeeper::params {
   $client_port            = 2181
+  $autoupgrade            = false
   $zookeeper_start_binary = '/usr/bin/zookeeper-server' # managed by zookeeper-server RPM, do not change unless you
                                                         # are certain that your RPM uses a different path
   # Because $command relies on the $zookeeper_start_binary variable, it must be defined AFTER $zookeeper_start_binary.
-  $command                = "${zookeeper_start_binary} start-foreground"
-  $config                 = '/etc/zookeeper/conf/zoo.cfg' # managed by zookeeper-server RPM, do not change unless you
+#  $command                = "${zookeeper_start_binary} start-foreground"
+  $command                = '/opt/zookeeper/bin/zkServer.sh start-foreground'
+  $config                 = '/opt/zookeeper/conf/zoo.cfg' # managed by zookeeper-server RPM, do not change unless you
                                                           # are certain that your RPM uses a different path
   $config_map             = {
                               'autopurge.purgeInterval'   => 24,
@@ -20,7 +22,7 @@ class zookeeper::params {
   $data_dir               = '/var/lib/zookeeper'
   # Because $dataLogDir relies on $data_dir, it must be defined AFTER $data_dir.
   $data_log_dir           = $data_dir
-  $group                  = 'zookeeper' # managed by zookeeper-server RPM, do not change unless you are certain that
+  $group                  = 'service' # managed by zookeeper-server RPM, do not change unless you are certain that
                                         # your RPM uses a different group
   $myid                   = 1
   $package_name           = 'zookeeper-server'
@@ -42,13 +44,41 @@ class zookeeper::params {
   $service_stdout_logfile_maxsize = '20MB'
   $service_stopasgroup    = true
   $service_stopsignal     = 'INT'
+  $user_home          = '/home/zookeeper'
+  $user_manage         = true
+  $user_managehome     = true
   $user                   = 'zookeeper' # managed by zookeeper-server RPM, do not change unless you are certain that
                                         # your RPM uses a different user
   case $::osfamily {
     'RedHat': {}
+    'Debian': {}
 
     default: {
       fail("The ${module_name} module is not supported on a ${::osfamily} based system.")
+    }
+  }
+
+  case $::kernel {
+    'Linux': {
+      $package_dir = '/opt/zookeeper/swdl'
+    }
+    default: {
+      fail("\"${module_name}\" provides no config directory default value for \"${::kernel}\"")
+    }
+  }
+
+  # Download tool
+
+  case $::kernel {
+    'Linux': {
+      $download_tool = 'wget -O'
+    }
+    'Darwin': {
+      $download_tool = 'curl -o'
+    }
+    default: {
+      fail("\"${module_name}\" provides no download tool default value
+           for \"${::kernel}\"")
     }
   }
 }

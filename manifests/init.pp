@@ -18,8 +18,17 @@ class zookeeper (
   $data_log_dir           = $zookeeper::params::data_log_dir,
   $group                  = $zookeeper::params::group,
   $myid                   = $zookeeper::params::myid,
+
+  $version                = false,
+  $autoupgrade            = $zookeeper::params::autoupgrade,
+  $package_provider       = 'package',
   $package_name           = $zookeeper::params::package_name,
   $package_ensure         = $zookeeper::params::package_ensure,
+  $package_url            = undef,
+  $package_dir            = $zookeeper::params::package_dir,
+  $purge_package_dir      = false,
+  $package_dl_timeout     = 600,  # package download timeout
+
   $quorum                 = $zookeeper::params::quorum,
   $service_autorestart    = hiera('zookeeper::service_autorestart', $zookeeper::params::service_autorestart),
   $service_enable         = hiera('zookeeper::service_enable', $zookeeper::params::service_enable),
@@ -35,6 +44,9 @@ class zookeeper (
   $service_stopasgroup    = hiera('zookeeper::service_stopasgroup', $zookeeper::params::service_stopasgroup),
   $service_stopsignal     = $zookeeper::params::service_stopsignal,
   $user                   = $zookeeper::params::user,
+  $user_home           = $zookeeper::params::user_home,
+  $user_manage         = hiera('zookeeper::user_manage', $zookeeper::params::user_manage),
+  $user_managehome     = hiera('zookeeper::user_managehome', $zookeeper::params::user_managehome),
   $zookeeper_start_binary = $zookeeper::params::zookeeper_start_binary,
 ) inherits zookeeper::params {
 
@@ -72,9 +84,13 @@ class zookeeper (
 
   $is_standalone = empty($quorum)
 
+  include '::zookeeper::users'
   include '::zookeeper::install'
   include '::zookeeper::config'
   include '::zookeeper::service'
+
+  # package(s)
+  class { 'zookeeper::package': }
 
   # Anchor this as per #8040 - this ensures that classes won't float off and
   # mess everything up. You can read about this at:
@@ -82,6 +98,11 @@ class zookeeper (
   anchor { 'zookeeper::begin': }
   anchor { 'zookeeper::end': }
 
-  Anchor['zookeeper::begin'] -> Class['::zookeeper::install'] -> Class['::zookeeper::config']
-    ~> Class['::zookeeper::service'] -> Anchor['zookeeper::end']
+  Anchor['zookeeper::begin']
+    -> Class['::zookeeper::users']
+    -> Class['::zookeeper::package']
+    -> Class['::zookeeper::install']
+    -> Class['::zookeeper::config']
+    ~> Class['::zookeeper::service']
+    -> Anchor['zookeeper::end']
 }

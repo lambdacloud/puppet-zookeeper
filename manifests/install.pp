@@ -2,10 +2,10 @@
 #
 class zookeeper::install inherits zookeeper {
 
-  package { 'zookeeper-server':
-    ensure  => $package_ensure,
-    name    => $package_name,
-  }
+#  package { 'zookeeper-server':
+#    ensure  => $package_ensure,
+#    name    => $package_name,
+#  }
 
   # We provide a custom zookeeper-server startup script.  This script fixes a problem where supervisord is not able to
   # restart the ZooKeeper processes (parent and child).  See https://github.com/miguno/puppet-zookeeper/issues/1.
