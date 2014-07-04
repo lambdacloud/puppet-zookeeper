@@ -23,13 +23,13 @@ class zookeeper::service inherits zookeeper {
       false => "test ! -d ${data_dir}/version-2 -o ! -s ${data_dir}/myid",
     }
 
-    exec { 'zookeeper-initialize':
-      command => 'service zookeeper-server init',
-      path    => ['/usr/bin', '/usr/sbin', '/sbin', '/bin'],
-      user    => 'root',
-      onlyif  => $initialize_check,
-      require => [ Class['zookeeper::install'], Class['zookeeper::config'] ],
-    }
+#    exec { 'zookeeper-initialize':
+#      command => 'zookeeper-server start',
+#      path    => ['/usr/bin', '/usr/sbin', '/sbin', '/bin'],
+#      user    => 'root',
+#      onlyif  => $initialize_check,
+#      require => [ Class['zookeeper::install'], Class['zookeeper::config'] ],
+#    }
 
     supervisor::service {
       $service_name:
@@ -48,15 +48,16 @@ class zookeeper::service inherits zookeeper {
         stdout_logfile_keep    => $service_stdout_logfile_keep,
         stderr_logfile_maxsize => $service_stderr_logfile_maxsize,
         stderr_logfile_keep    => $service_stderr_logfile_keep,
-        require                => [ Exec['zookeeper-initialize'], Class['zookeeper::config'], Class['::supervisor'] ],
+        #require                => [ Exec['zookeeper-initialize'], Class['zookeeper::config'], Class['::supervisor'] ],
+        require                => [  Class['zookeeper::config'], Class['::supervisor'] ],
     }
 
     # Make sure that the init.d script shipped with zookeeper-server is not registered as a system service and that the
     # service itself is not running in any case (because we want to run ZooKeeper via supervisord).
-    service { $package_name:
-      ensure => 'stopped',
-      enable => false,
-    }
+#    service { $package_name:
+#      ensure => 'stopped',
+#      enable => false,
+#    }
 
     $subscribe_real = $is_standalone ? {
       true  => File[$config],
