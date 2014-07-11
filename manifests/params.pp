@@ -8,8 +8,10 @@ class zookeeper::params {
   # Because $command relies on the $zookeeper_start_binary variable, it must be defined AFTER $zookeeper_start_binary.
 #  $command                = "${zookeeper_start_binary} start-foreground"
   $command                = '/opt/zookeeper/bin/zkServer.sh start-foreground'
+  $config_dir             = '/opt/zookeeper/conf'
   $config                 = '/opt/zookeeper/conf/zoo.cfg' # managed by zookeeper-server RPM, do not change unless you
                                                           # are certain that your RPM uses a different path
+  log_config           = '/opt/zookeeper/conf/log4j.properties'
   $config_map             = {
                               'autopurge.purgeInterval'   => 24,
                               'autopurge.snapRetainCount' => 5,
@@ -19,6 +21,7 @@ class zookeeper::params {
                               'tickTime'                  => 2000,
                             }
   $config_template        = 'zookeeper/zoo.cfg.erb'
+  $log_config_template    = 'zookeeper/log4j.properties.erb'
   $data_dir               = '/var/lib/zookeeper'
   # Because $dataLogDir relies on $data_dir, it must be defined AFTER $data_dir.
   $data_log_dir           = $data_dir

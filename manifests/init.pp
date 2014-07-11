@@ -11,9 +11,12 @@
 class zookeeper (
   $client_port            = $zookeeper::params::client_port,
   $command                = $zookeeper::params::command,
+  $config_dir             = $zookeeper::params::config_dir,
   $config                 = $zookeeper::params::config,
+  $log_config             = $zookeeper::params::log_config,
   $config_map             = $zookeeper::params::config_map,
   $config_template        = $zookeeper::params::config_template,
+  $log_config_template    = $zookeeper::params::log_config_template,
   $data_dir               = $zookeeper::params::data_dir,
   $data_log_dir           = $zookeeper::params::data_log_dir,
   $group                  = $zookeeper::params::group,
