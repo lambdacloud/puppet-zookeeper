@@ -11,7 +11,7 @@ class zookeeper::params {
   $config_dir             = '/opt/zookeeper/conf'
   $config                 = '/opt/zookeeper/conf/zoo.cfg' # managed by zookeeper-server RPM, do not change unless you
                                                           # are certain that your RPM uses a different path
-  log_config           = '/opt/zookeeper/conf/log4j.properties'
+  $log_config           = '/opt/zookeeper/conf/log4j.properties'
   $config_map             = {
                               'autopurge.purgeInterval'   => 24,
                               'autopurge.snapRetainCount' => 5,
